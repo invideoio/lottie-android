@@ -22,10 +22,20 @@ fun rememberLottieAnimationState(
     enableMergePaths: Boolean = true,
     imageAssetsFolder: String? = null,
     imageAssetDelegate: ImageAssetDelegate? = null,
+    clipSpec: LottieAnimationClipSpec? = null,
 
 ): LottieAnimationState {
-    // Use rememberSavedInstanceState so you can pause/resume animations
-    return remember(repeatCount, autoPlay) {
+    // TODO: Use rememberSavedInstanceState so you can pause/resume animations
+    return remember(
+        repeatCount,
+        autoPlay,
+        repeatCount,
+        initialProgress,
+        enableMergePaths,
+        imageAssetsFolder,
+        imageAssetDelegate,
+        clipSpec,
+    ) {
         LottieAnimationState(
             isPlaying = autoPlay,
             repeatCount = repeatCount,
@@ -33,6 +43,7 @@ fun rememberLottieAnimationState(
             enableMergePaths = enableMergePaths,
             imageAssetsFolder = imageAssetsFolder,
             imageAssetDelegate = imageAssetDelegate,
+            clipSpec = clipSpec,
         )
     }
 }
@@ -56,6 +67,7 @@ class LottieAnimationState(
     enableMergePaths: Boolean = true,
     imageAssetsFolder: String? = null,
     imageAssetDelegate: ImageAssetDelegate? = null,
+    clipSpec: LottieAnimationClipSpec? = null,
 ) {
     var progress by mutableStateOf(initialProgress)
 
@@ -137,6 +149,8 @@ class LottieAnimationState(
      * Sketch or Illustrator to avoid this.
      */
     var imageAssetDelegate by mutableStateOf(imageAssetDelegate)
+
+    var clipSpec by mutableStateOf(clipSpec)
 
     internal fun updateFrame(frame: Int) {
         _frame.value = frame

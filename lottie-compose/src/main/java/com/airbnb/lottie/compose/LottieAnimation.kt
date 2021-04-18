@@ -21,9 +21,6 @@ import java.util.zip.ZipInputStream
 import kotlin.math.floor
 
 
-/**
- * TODO: add error handling
- */
 @Composable
 fun rememberLottieComposition(spec: LottieAnimationSpec): LottieCompositionResult {
     val context = LocalContext.current
@@ -96,14 +93,17 @@ fun LottieAnimation(
 
     SideEffect {
         drawable.composition = composition
+        state.clipSpec?.applyTo(drawable)
     }
-
-    // TODO: handle min/max frame setting
 
     LaunchedEffect(composition, state.isPlaying) {
         if (!state.isPlaying || composition == null) return@LaunchedEffect
         var repeatCount = 0
-        if (state.isPlaying && state.progress == 1f) state.progress = 0f
+        val minProgress = state.clipSpec?.getMinProgress(composition) ?: 0f
+        val maxProgress = state.clipSpec?.getMaxProgress(composition) ?: 1f
+        if (state.isPlaying && state.progress == 1f) {
+            state.progress = minProgress
+        }
         var lastFrameTime = withFrameNanos { it }
         while (true) {
             withFrameNanos { frameTime ->
@@ -111,11 +111,12 @@ fun LottieAnimation(
                 lastFrameTime = frameTime
                 val dProgress = (dTime * state.speed) / composition.duration
                 val previousProgress = state.progress
-                state.progress = (state.progress + dProgress) % 1f
+                state.progress = (minProgress + (((state.progress - minProgress) + dProgress) % (maxProgress - minProgress)))
+                    .coerceIn(minProgress, maxProgress)
                 if (previousProgress > state.progress) {
                     repeatCount++
                     if (repeatCount != 0 && repeatCount > state.repeatCount) {
-                        state.progress = 1f
+                        state.progress = maxProgress
                         state.isPlaying = false
                     }
                 }

@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.airbnb.lottie.ImageAssetDelegate
 import com.airbnb.lottie.LottieComposition
 import com.airbnb.lottie.compose.*
 import com.airbnb.lottie.sample.compose.BuildConfig
@@ -48,7 +49,18 @@ fun PlayerPage(
 ) {
     val backPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val compositionResult = rememberLottieComposition(spec)
-    val animationState = rememberLottieAnimationState(autoPlay = true, repeatCount = Integer.MAX_VALUE)
+    val imageAssetDelegate = remember(compositionResult) {
+        if (compositionResult is LottieCompositionResult.Success) {
+            ImageAssetDelegate { it.bitmap }
+        } else {
+            null
+        }
+    }
+    val animationState = rememberLottieAnimationState(
+        autoPlay = true,
+        repeatCount = Integer.MAX_VALUE,
+        imageAssetDelegate = imageAssetDelegate,
+    )
     val scaffoldState = rememberScaffoldState()
     val outlineMasksAndMattes = remember { mutableStateOf(false) }
     val applyOpacityToLayers = remember { mutableStateOf(false) }
