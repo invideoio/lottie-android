@@ -15,7 +15,7 @@
  */
 
 apply plugin: 'maven'
-apply plugin: 'signing'
+//apply plugin: 'signing'
 
 def isReleaseBuild() {
     return VERSION_NAME.contains("SNAPSHOT") == false
@@ -43,7 +43,7 @@ afterEvaluate { project ->
     uploadArchives {
         repositories {
             mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+//                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
                 pom.withXml {
                     asNode().dependencies.dependency.findAll {
@@ -60,12 +60,16 @@ afterEvaluate { project ->
                 pom.artifactId = POM_ARTIFACT_ID
                 pom.version = VERSION_NAME
 
-                repository(url: getReleaseRepositoryUrl()) {
+/*                repository(url: getReleaseRepositoryUrl()) {
                     authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
-                }
-                snapshotRepository(url: getSnapshotRepositoryUrl()) {
+                }*/
+
+                repository(url: mavenLocal().getUrl())
+
+/*                snapshotRepository(url: getSnapshotRepositoryUrl()) {
                     authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
-                }
+                }*/
+                snapshotRepository(url: mavenLocal().getUrl())
 
                 pom.project {
                     name POM_NAME
@@ -98,10 +102,10 @@ afterEvaluate { project ->
         }
     }
 
-    signing {
+/*    signing {
         required { isReleaseBuild() && gradle.taskGraph.hasTask("uploadArchives") }
         sign configurations.archives
-    }
+    }*/
 
     task androidJavadocs(type: Javadoc) {
         failOnError false
