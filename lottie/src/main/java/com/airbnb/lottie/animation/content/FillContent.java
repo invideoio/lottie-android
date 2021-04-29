@@ -115,6 +115,10 @@ public class FillContent
     );
   }
 
+  @Override public DrawState computeDrawState(Matrix parentMatrix, int alpha) {
+    return null;
+  }
+
   @Override public void resolveKeyPath(
       KeyPath keyPath, int depth, List<KeyPath> accumulator, KeyPath currentPartialKeyPath) {
     MiscUtils.resolveKeyPath(keyPath, depth, accumulator, currentPartialKeyPath, this);

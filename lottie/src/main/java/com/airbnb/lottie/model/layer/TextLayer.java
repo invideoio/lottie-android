@@ -14,6 +14,7 @@ import com.airbnb.lottie.LottieDrawable;
 import com.airbnb.lottie.LottieProperty;
 import com.airbnb.lottie.TextDelegate;
 import com.airbnb.lottie.animation.content.ContentGroup;
+import com.airbnb.lottie.animation.content.DrawState;
 import com.airbnb.lottie.animation.keyframe.BaseKeyframeAnimation;
 import com.airbnb.lottie.animation.keyframe.TextKeyframeAnimation;
 import com.airbnb.lottie.animation.keyframe.ValueCallbackKeyframeAnimation;
@@ -110,6 +111,10 @@ public class TextLayer extends BaseLayer {
     super.getBounds(outBounds, parentMatrix, applyParents);
     // TODO: use the correct text bounds.
     outBounds.set(0, 0, composition.getBounds().width(), composition.getBounds().height());
+  }
+
+  @Override public DrawState computeDrawState(Matrix parentMatrix, int alpha) {
+    return null;
   }
 
   @Override

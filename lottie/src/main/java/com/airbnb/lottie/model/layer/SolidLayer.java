@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import com.airbnb.lottie.LottieDrawable;
 import com.airbnb.lottie.LottieProperty;
 import com.airbnb.lottie.animation.LPaint;
+import com.airbnb.lottie.animation.content.DrawState;
 import com.airbnb.lottie.animation.keyframe.BaseKeyframeAnimation;
 import com.airbnb.lottie.animation.keyframe.ValueCallbackKeyframeAnimation;
 import com.airbnb.lottie.value.LottieValueCallback;
@@ -74,6 +75,10 @@ public class SolidLayer extends BaseLayer {
     rect.set(0, 0, layerModel.getSolidWidth(), layerModel.getSolidHeight());
     boundsMatrix.mapRect(rect);
     outBounds.set(rect);
+  }
+
+  @Override public DrawState computeDrawState(Matrix parentMatrix, int alpha) {
+    return null;
   }
 
   @SuppressWarnings("unchecked")

@@ -13,6 +13,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -1180,6 +1181,7 @@ public class LottieDrawable extends Drawable implements Drawable.Callback, Anima
 
     matrix.reset();
     matrix.preScale(scaleX, scaleY);
+    Log.d("Lottie state", compositionLayer.computeDrawState(matrix, alpha).toString());
     compositionLayer.draw(canvas, matrix, alpha);
 
     if (saveCount > 0) {
@@ -1225,6 +1227,8 @@ public class LottieDrawable extends Drawable implements Drawable.Callback, Anima
 
     matrix.reset();
     matrix.preScale(scale, scale);
+    Log.d("Lottie state", compositionLayer.computeDrawState(matrix, alpha).toString());
+
     compositionLayer.draw(canvas, matrix, alpha);
 
     if (saveCount > 0) {

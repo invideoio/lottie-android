@@ -122,6 +122,10 @@ public class RepeaterContent implements DrawingContent, PathContent, GreedyConte
     contentGroup.getBounds(outBounds, parentMatrix, applyParents);
   }
 
+  @Override public DrawState computeDrawState(Matrix parentMatrix, int alpha) {
+    return null;
+  }
+
   @Override public void onValueChanged() {
     lottieDrawable.invalidateSelf();
   }

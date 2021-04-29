@@ -155,6 +155,33 @@ public class ContentGroup implements DrawingContent, PathContent,
     return path;
   }
 
+  @Override public DrawState computeDrawState(Matrix parentMatrix, int parentAlpha) {
+    if (hidden) {
+      return null;
+    }
+    List<DrawState> drawStates = new ArrayList<>();
+    matrix.set(parentMatrix);
+    int layerAlpha;
+    if (transformAnimation != null) {
+      matrix.preConcat(transformAnimation.getMatrix());
+      int opacity = transformAnimation.getOpacity() == null ? 100 : transformAnimation.getOpacity().getValue();
+      layerAlpha = (int) ((opacity / 100f * parentAlpha / 255f) * 255);
+    } else {
+      layerAlpha = parentAlpha;
+    }
+
+    boolean isRenderingWithOffScreen = lottieDrawable.isApplyingOpacityToLayersEnabled() && hasTwoOrMoreDrawableContent() && layerAlpha != 255;
+    int childAlpha = isRenderingWithOffScreen ? 255 : layerAlpha;
+    for (int i = contents.size() - 1; i >= 0; i--) {
+      Object content = contents.get(i);
+      if (content instanceof DrawingContent) {
+        drawStates.add(((DrawingContent) content).computeDrawState(parentMatrix, childAlpha));
+      }
+    }
+    // TODO think about this one
+    return new ContentGroupDrawState(drawStates);
+  }
+
   @Override public void draw(Canvas canvas, Matrix parentMatrix, int parentAlpha) {
     if (hidden) {
       return;
@@ -249,6 +276,20 @@ public class ContentGroup implements DrawingContent, PathContent,
   public <T> void addValueCallback(T property, @Nullable LottieValueCallback<T> callback) {
     if (transformAnimation != null) {
       transformAnimation.applyValueCallback(property, callback);
+    }
+  }
+
+  public static class ContentGroupDrawState extends DrawState {
+    public List<DrawState> drawStates;
+
+    public ContentGroupDrawState(List<DrawState> drawStates) {
+      this.drawStates = drawStates;
+    }
+
+    @Override public String toString() {
+      return "ContentGroupDrawState{" +
+          "drawStates=" + drawStates +
+          '}';
     }
   }
 }

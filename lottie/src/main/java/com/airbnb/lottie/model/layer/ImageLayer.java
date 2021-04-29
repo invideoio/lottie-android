@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import com.airbnb.lottie.LottieDrawable;
 import com.airbnb.lottie.LottieProperty;
 import com.airbnb.lottie.animation.LPaint;
+import com.airbnb.lottie.animation.content.DrawState;
 import com.airbnb.lottie.animation.keyframe.BaseKeyframeAnimation;
 import com.airbnb.lottie.animation.keyframe.ValueCallbackKeyframeAnimation;
 import com.airbnb.lottie.utils.Utils;
@@ -55,6 +56,10 @@ public class ImageLayer extends BaseLayer {
       outBounds.set(0, 0, bitmap.getWidth() * Utils.dpScale(), bitmap.getHeight() * Utils.dpScale());
       boundsMatrix.mapRect(outBounds);
     }
+  }
+
+  @Override public DrawState computeDrawState(Matrix parentMatrix, int alpha) {
+    return null;
   }
 
   @Nullable

@@ -36,6 +36,10 @@ public class StrokeContent extends BaseStrokeContent {
     layer.addAnimation(colorAnimation);
   }
 
+  @Override public DrawState computeDrawState(Matrix parentMatrix, int alpha) {
+    return super.computeDrawState(parentMatrix, alpha);
+  }
+
   @Override public void draw(Canvas canvas, Matrix parentMatrix, int parentAlpha) {
     if (hidden) {
       return;

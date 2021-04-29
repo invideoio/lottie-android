@@ -3,12 +3,14 @@ package com.airbnb.lottie.model.layer;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.RectF;
 
 import com.airbnb.lottie.L;
 import com.airbnb.lottie.LottieComposition;
 import com.airbnb.lottie.LottieDrawable;
 import com.airbnb.lottie.LottieProperty;
+import com.airbnb.lottie.animation.content.DrawState;
 import com.airbnb.lottie.animation.keyframe.BaseKeyframeAnimation;
 import com.airbnb.lottie.animation.keyframe.ValueCallbackKeyframeAnimation;
 import com.airbnb.lottie.model.KeyPath;
@@ -126,6 +128,31 @@ public class CompositionLayer extends BaseLayer {
     }
   }
 
+  @Override public DrawState computeDrawState(Matrix parentMatrix, int parentAlpha) {
+    L.beginSection("CompositionLayer#draw");
+    List<DrawState> drawStates = new ArrayList<>();
+    newClipRect.set(0, 0, layerModel.getPreCompWidth(), layerModel.getPreCompHeight());
+    parentMatrix.mapRect(newClipRect);
+
+    // Apply off-screen rendering only when needed in order to improve rendering performance.
+    boolean isDrawingWithOffScreen = lottieDrawable.isApplyingOpacityToLayersEnabled() && layers.size() > 1 && parentAlpha != 255;
+
+    int childAlpha = isDrawingWithOffScreen ? 255 : parentAlpha;
+    for (int i = layers.size() - 1; i >= 0; i--) {
+      boolean nonEmptyClip = true;
+      if (!newClipRect.isEmpty()) {
+        nonEmptyClip = true; // canvas.clipRect(newClipRect);
+      }
+      if (nonEmptyClip) {
+        BaseLayer layer = layers.get(i);
+        drawStates.add(layer.computeDrawState(parentMatrix, childAlpha));
+      }
+    }
+    L.endSection("CompositionLayer#draw");
+    // TODO critical
+    return new CompositionDrawState(drawStates);
+  }
+
   @Override public void setProgress(@FloatRange(from = 0f, to = 1f) float progress) {
     super.setProgress(progress);
     if (timeRemapping != null) {
@@ -208,6 +235,20 @@ public class CompositionLayer extends BaseLayer {
         timeRemapping.addUpdateListener(this);
         addAnimation(timeRemapping);
       }
+    }
+  }
+
+  public static class CompositionDrawState extends DrawState {
+    public List<DrawState> drawStates;
+
+    public CompositionDrawState(List<DrawState> drawStates) {
+      this.drawStates = drawStates;
+    }
+
+    @Override public String toString() {
+      return "CompositionDrawState{" +
+          "drawStates=" + drawStates +
+          '}';
     }
   }
 }

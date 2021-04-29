@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import com.airbnb.lottie.LottieDrawable;
 import com.airbnb.lottie.animation.content.Content;
 import com.airbnb.lottie.animation.content.ContentGroup;
+import com.airbnb.lottie.animation.content.DrawState;
 import com.airbnb.lottie.model.KeyPath;
 import com.airbnb.lottie.model.content.ShapeGroup;
 
@@ -33,6 +34,10 @@ public class ShapeLayer extends BaseLayer {
   @Override public void getBounds(RectF outBounds, Matrix parentMatrix, boolean applyParents) {
     super.getBounds(outBounds, parentMatrix, applyParents);
     contentGroup.getBounds(outBounds, boundsMatrix, applyParents);
+  }
+
+  @Override public DrawState computeDrawState(Matrix parentMatrix, int alpha) {
+    return contentGroup.computeDrawState(parentMatrix, alpha);
   }
 
   @Override

@@ -145,6 +145,10 @@ public class GradientFillContent
     );
   }
 
+  @Override public DrawState computeDrawState(Matrix parentMatrix, int alpha) {
+    return null;
+  }
+
   @Override public String getName() {
     return name;
   }

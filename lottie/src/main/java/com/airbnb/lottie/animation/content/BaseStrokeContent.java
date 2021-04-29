@@ -137,6 +137,31 @@ public abstract class BaseStrokeContent
     }
   }
 
+  @Override public DrawState computeDrawState(Matrix parentMatrix, int parentAlpha) {
+    int alpha = (int) ((parentAlpha / 255f * ((IntegerKeyframeAnimation) opacityAnimation).getIntValue() / 100f) * 255);
+
+    List<Path> pathList = new ArrayList<>();
+    for (int i = 0; i < pathGroups.size(); i++) {
+      Path path = new Path();
+      PathGroup pathGroup = pathGroups.get(i);
+
+      if (pathGroup.trimPath != null) {
+//        applyTrimPath(canvas, pathGroup, parentMatrix);
+      } else {
+        L.beginSection("StrokeContent#buildPath");
+        for (int j = pathGroup.paths.size() - 1; j >= 0; j--) {
+          path.addPath(pathGroup.paths.get(j).getPath(), parentMatrix);
+        }
+        L.endSection("StrokeContent#buildPath");
+        L.beginSection("StrokeContent#drawPath");
+        pathList.add(path);
+        L.endSection("StrokeContent#drawPath");
+      }
+    }
+
+    return new BaseStrokeDrawState(pathList);
+  }
+
   @Override public void draw(Canvas canvas, Matrix parentMatrix, int parentAlpha) {
     L.beginSection("StrokeContent#draw");
     if (Utils.hasZeroScaleAxis(parentMatrix)) {
@@ -340,4 +365,19 @@ public abstract class BaseStrokeContent
       this.trimPath = trimPath;
     }
   }
+
+  public static class BaseStrokeDrawState extends DrawState {
+    private List<Path> pathList;
+
+    public BaseStrokeDrawState(List<Path> pathList) {
+      this.pathList = pathList;
+    }
+
+    @Override public String toString() {
+      return "BaseStrokeDrawState{" +
+          "pathList=" + pathList +
+          '}';
+    }
+  }
 }
+
