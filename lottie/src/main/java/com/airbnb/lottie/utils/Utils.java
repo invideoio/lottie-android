@@ -7,8 +7,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.PathMeasure;
+// import android.graphics.Path;
+import com.airbnb.lottie.ivvectoranimation.Path;
+// import android.graphics.PathMeasure;
+import com.airbnb.lottie.ivvectoranimation.PathMeasure;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.Build;
@@ -319,7 +321,7 @@ public final class Utils {
     Paint paint = new LPaint();
     paint.setAntiAlias(true);
     paint.setColor(Color.BLUE);
-    canvas.drawPath(path, paint);
+    // canvas.drawPath(path, paint);
     return bitmap;
   }
 }

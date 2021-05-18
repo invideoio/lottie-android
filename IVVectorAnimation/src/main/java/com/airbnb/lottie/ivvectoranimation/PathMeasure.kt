@@ -1,78 +1,55 @@
-package com.airbnb.lottie
+package com.airbnb.lottie.ivvectoranimation
 
-import android.graphics.Path
-import android.graphics.Point
+//import android.graphics.Path
 import android.graphics.PointF
-import android.os.Build
-import androidx.annotation.RequiresApi
-import com.soywiz.korma.geom.bezier.Bezier
-import com.soywiz.korma.geom.bezier.SegmentEmitter
-import com.soywiz.korma.geom.vector.VectorPath
-import com.soywiz.korma.geom.vector.isEmpty
-import com.soywiz.korma.geom.vector.lineTo
+import com.soywiz.korma.geom.vector.*
 import kotlin.math.*
 
 const val kMaxTValue = 0x3FFFFFFF
 const val CHEAP_DIST_LIMIT = 0.5F
 
-abstract class IVPathMeasure(path: VectorPath = VectorPath(), forceClosed : Boolean = false,
-                             resScale: Float) {
+class Path {
 
-    var path: VectorPath
-    var forceClosed: Boolean
+    var path: VectorPath = VectorPath()
+
+    fun moveTo(x: Float, y: Float) {
+        path.moveTo(x, y)
+    }
+
+    fun cubicTo(fl: Float, fl1: Float, fl2: Float, fl3: Float, x: Float, y: Float) {
+        path.cubicTo(fl, fl1, fl2, fl3, x, y)
+    }
+
+    fun lineTo(x: Float, y: Float) {
+        path.lineTo(x, y)
+    }
+
+    fun reset() {
+        path.clear()
+    }
+
+    fun addPath(tempPath: Path) {
+        path.appendFrom(tempPath.path)
+    }
+
+    fun set(tempPath: Path) {
+        path.setFrom(tempPath.path)
+    }
+
+}
+
+class PathMeasure(var path: VectorPath = VectorPath(), var forceClosed : Boolean = false,
+                  var resScale: Float = 0F) {
+
     var isClosed: Boolean = false
     var segments = mutableListOf<Segment>()
     var pts = mutableListOf<PointF>()
-    var verbs = mutableListOf<Int>()
     var firstPtIndex : Int = -1
-    private var length = -1F
-    lateinit var iter: Iter
-    var tolerance : Float = CHEAP_DIST_LIMIT * resScale
+    private var pathLength = -1F
+    var tolerance : Float
 
     init {
-        this.path = path
-        this.forceClosed = forceClosed
-    }
-
-    enum class Verb {
-        kMove_Verb,
-        kLine_Verb,
-        kQuad_Verb,
-        kConic_Verb,
-        kCubic_Verb,
-        kClose_Verb,
-        kDone_Verb
-    }
-
-    class Iter {
-
-    }
-
-    fun Iter.setPath(path: VectorPath, forceClosed: Boolean) {
-        pts.addAll(path.getPoints() as MutableList<PointF>)
-        verbs.addAll(path.commands)
-        // fVerbStop not declared or set since it won't be necessary for now
-        // fConicWeights not declared or set since Conics are not being handled yet
-
-        // some variables of SkPath do not exist on VectorPath class, are they gonna be
-        // necessary ???
-
-    }
-
-    fun Iter.next(pts: Array<PointF>, doConsumeDegenerates: Boolean = true,
-             exact: Boolean = false) : Verb {
-        if(doConsumeDegenerates) {
-            this.consumeDegenerateSegments(exact)
-        }
-        return this.doNext(pts)
-    }
-
-    fun Iter.consumeDegenerateSegments(exact: Boolean) {
-        // MUST Implement
-    }
-
-    fun Iter.doNext(pts: Array<PointF>) : Verb {
-        return Verb.kLine_Verb // MUST Implement properly
+        tolerance = CHEAP_DIST_LIMIT * resScale
     }
 
     companion object {
@@ -82,7 +59,8 @@ abstract class IVPathMeasure(path: VectorPath = VectorPath(), forceClosed : Bool
     }
 
     data class Segment(var distance: Float, var ptIndex: Int,
-                       var tValue: Int = 30, var type: SegType = SegType.kQuad_SegType) {
+                       var tValue: Int = 30, var type: SegType = SegType.kQuad_SegType
+    ) {
         fun getT() : Float {
             return tValue2Scalar(this.tValue)
         }
@@ -124,7 +102,7 @@ abstract class IVPathMeasure(path: VectorPath = VectorPath(), forceClosed : Bool
         }
     }
 
-    private fun Vec2(point: PointF): IVPathMeasure.Vec2 {
+    private fun Vec2(point: PointF): Vec2 {
         return Vec2(point.x, point.y)
     }
 
@@ -531,7 +509,8 @@ abstract class IVPathMeasure(path: VectorPath = VectorPath(), forceClosed : Bool
     }
 
     fun compute_pos_tan(pts: Array<PointF>, segType: SegType, t: Float,
-                        pos: PointF, tangent: Vec2) {
+                        pos: PointF, tangent: Vec2
+    ) {
         when(segType) {
             SegType.kLine_SegType -> {
                 val tt = PointF(t, t)
@@ -559,7 +538,8 @@ abstract class IVPathMeasure(path: VectorPath = VectorPath(), forceClosed : Bool
     }
 
     private fun evalCubicAt(src: Array<PointF>, t: Float,
-                            loc: PointF, tangent: IVPathMeasure.Vec2) {
+                            loc: PointF, tangent: Vec2
+    ) {
         loc.set(CubicCoeff(src).eval(t))
         if((t == 0F && src[0] == src[1]) || (t == 1F && src[2] == src[3])) {
             if(t == 0F) {
@@ -579,7 +559,7 @@ abstract class IVPathMeasure(path: VectorPath = VectorPath(), forceClosed : Bool
         // anywhere in the code...
     }
 
-    private fun eval_cubic_derivative(src: Array<PointF>, t: Float): IVPathMeasure.Vec2 {
+    private fun eval_cubic_derivative(src: Array<PointF>, t: Float): PathMeasure.Vec2 {
         val coeff = QuadCoeff(PointF(), PointF(), PointF())
         val p0 = src[0]
         val p1 = src[1]
@@ -602,98 +582,83 @@ abstract class IVPathMeasure(path: VectorPath = VectorPath(), forceClosed : Bool
         var ptIndex = this.firstPtIndex
         var distance = 0F
         var isClosed = this.forceClosed
-        var firstMoveTo = ptIndex < 0
         val seg = Segment(0F, 0)
 
         segments.clear()
-        var done = false
-        do {
-            when(iter.next(pts)) {
-                Verb.kMove_Verb -> {
-                    ptIndex += 1
-                    this.pts.add(pts[0])
-                    if(!firstMoveTo) {
-                        done = true
-                        break
-                    }
-                    firstMoveTo = false
-                    break
+        path.visitCmds(
+            moveTo = { x, y ->
+                ptIndex += 1
+                pts[0] = PointF(x.toFloat(), y.toFloat())
+                this.pts.add(pts[0])
+            },
+            lineTo = { x, y ->
+                pts[1] = PointF(x.toFloat(), y.toFloat())
+                val d = PointF.length(pts[0].x - pts[1].x, pts[0].y - pts[1].y)
+                val prevD = distance
+                distance += d
+                if(distance > prevD) {
+                    segments.add(Segment(distance, ptIndex, kMaxTValue, SegType.kLine_SegType))
+                    this.pts.add(pts[1])
+                    ptIndex++
                 }
-                Verb.kLine_Verb -> {
-                    val d = PointF.length(pts[0].x - pts[1].x, pts[0].y - pts[1].y)
-                    val prevD = distance
-                    distance += d
-                    if(distance > prevD) {
-                        segments.add(Segment(distance, ptIndex, kMaxTValue, SegType.kLine_SegType))
-                        this.pts.add(pts[1])
-                        ptIndex++
-                    }
-                    break
+            },
+            quadTo = { x0, y0, x1, y1 ->
+                pts[1] = PointF(x0.toFloat(), y0.toFloat())
+                pts[2] = PointF(x1.toFloat(), y1.toFloat())
+                val prevD = distance
+                distance = compute_quad_segs(pts, distance, 0, kMaxTValue, ptIndex)
+                if(distance > prevD) {
+                    this.pts.add(pts[1])
+                    this.pts.add(pts[2])
+                    ptIndex += 2
                 }
-                Verb.kQuad_Verb -> {
-                    val prevD = distance
-                    // NOTE: There was and if(false) here originally, which will never trigger.
-                    // Why as this here ???
-                    distance = compute_quad_segs(pts, distance, 0, kMaxTValue, ptIndex)
-                    if(distance > prevD) {
-                        this.pts.add(pts[1])
-                        this.pts.add(pts[2])
-                        ptIndex += 2
-                    }
-                    break
+            },
+            cubicTo = { x0, y0, x1, y1, x2, y2 ->
+                pts[1] = PointF(x0.toFloat(), y0.toFloat())
+                pts[2] = PointF(x1.toFloat(), y1.toFloat())
+                pts[3] = PointF(x2.toFloat(), y2.toFloat())
+                val prevD = distance
+                distance = compute_cubic_segs(pts, distance, 0, kMaxTValue, ptIndex)
+                if(distance > prevD) {
+                    this.pts.add(pts[1])
+                    this.pts.add(pts[2])
+                    this.pts.add(pts[3])
+                    ptIndex += 3
                 }
-                Verb.kConic_Verb -> println("Conic SegType not implemented")
-                Verb.kCubic_Verb -> {
-                    val prevD = distance
-                    distance = compute_cubic_segs(pts, distance, 0, kMaxTValue, ptIndex)
-                    if(distance > prevD) {
-                        this.pts.add(pts[1])
-                        this.pts.add(pts[2])
-                        this.pts.add(pts[3])
-                        ptIndex += 3
-                    }
-                    break
-                }
-                Verb.kClose_Verb -> {
-                    isClosed = true
-                    break
-                }
-                Verb.kDone_Verb -> {
-                    done = true
-                    break
-                }
+            },
+            close = {
+                isClosed = true
             }
-        } while(!done)
+        )
 
-        this.length = distance
+        this.pathLength = distance
         this.isClosed = isClosed
         this.firstPtIndex = ptIndex
     }
 
-    fun length() : Float {
+    fun getLength() : Float {
         if(this.path.isEmpty()) {
             return 0F
         }
-        if(this.length < 0F) {
+        if(this.pathLength < 0F) {
             buildSegments()
         }
-        if(length.isNaN()) {
-            this.length = 0F
+        if(pathLength.isNaN()) {
+            this.pathLength = 0F
         }
-        return this.length
+        return this.pathLength
     }
 
     fun nextContour() : Boolean {
-        this.length = -1F
-        return length() > 0F
+        this.pathLength = -1F
+        return getLength() > 0F
     }
 
-    fun setPath(path: VectorPath, forceClosed: Boolean) {
-        this.path = path
-        this.length = -1F   // signal we need to compute it
+    public fun setPath(path: Path, forceClosed: Boolean) {
+        this.path = path.path
+        this.pathLength = -1F   // signal we need to compute it
         this.forceClosed = forceClosed
         this.firstPtIndex = -1
-        this.iter.setPath(path, forceClosed)
         this.segments.clear()
         this.pts.clear()
     }
