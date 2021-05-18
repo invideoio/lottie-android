@@ -1,1 +1,2 @@
+include ':IVVectorAnimation'
 include ':LottieSample', ':lottie', ':issue-repro'
