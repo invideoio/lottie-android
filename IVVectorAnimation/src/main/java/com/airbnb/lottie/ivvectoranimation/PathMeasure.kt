@@ -1,6 +1,7 @@
 package com.airbnb.lottie.ivvectoranimation
 
 //import android.graphics.Path
+import android.graphics.Point
 import android.graphics.PointF
 import com.soywiz.korma.geom.vector.*
 import kotlin.math.*
@@ -35,6 +36,11 @@ class Path {
     fun set(tempPath: Path) {
         path.setFrom(tempPath.path)
     }
+
+    // THIS FUNCTION IS NOT BEING USED IN PRODUCTION
+//    fun computeBounds(bounds: RectF, b: Boolean) {
+//
+//    }
 
 }
 
@@ -654,7 +660,7 @@ class PathMeasure(var path: VectorPath = VectorPath(), var forceClosed : Boolean
         return getLength() > 0F
     }
 
-    public fun setPath(path: Path, forceClosed: Boolean) {
+    fun setPath(path: Path, forceClosed: Boolean) {
         this.path = path.path
         this.pathLength = -1F   // signal we need to compute it
         this.forceClosed = forceClosed
@@ -662,5 +668,80 @@ class PathMeasure(var path: VectorPath = VectorPath(), var forceClosed : Boolean
         this.segments.clear()
         this.pts.clear()
     }
+
+    fun getSegment(startD: Float, stopD: Float, dst: Path, startWithMoveTo: Boolean) : Boolean {
+        val length = getLength()
+
+        var startD = max(startD, 0F)
+        var stopD = min(stopD, length)
+
+        if(startD > stopD) return false
+        if(this.segments.count() == 0) return false
+
+        val p = PointF()
+
+        val startPair = distanceToSegment(startD)
+        val stopPair = distanceToSegment(stopD)
+        var seg = startPair.first
+        var startT: Float = startPair.second
+        val stopSeg = stopPair.first
+        var stopT: Float = stopPair.second
+
+
+        if(startWithMoveTo) {
+            val tmpPts = (this.pts as Array<PointF>).copyOfRange(seg.first().ptIndex, pts.lastIndex)
+            // update this.pts
+            compute_pos_tan(tmpPts, seg.first().type, startT, p, Vec2(0F, 0F))
+            dst.moveTo(p.x, p.y)
+        }
+
+        if(seg.first().ptIndex == stopSeg.first().ptIndex) {
+            val tmpPts = (this.pts as Array<PointF>).copyOfRange(seg.first().ptIndex, pts.lastIndex)
+            segTo(tmpPts, seg.first().type, startT, stopT, dst.path)
+            // update this.pts ?
+        } else {
+            val tmpPts = (this.pts as Array<PointF>).copyOfRange(seg.first().ptIndex, pts.lastIndex)
+            do {
+                segTo(tmpPts, seg.first().type, startT, 1F, dst.path)
+                // update this.pts ?
+                seg = nextSegment(seg)
+                startT = 0F
+            } while(seg.first().ptIndex < stopSeg.first().ptIndex)
+            segTo(tmpPts, seg.first().type, 0F, stopT, dst.path)
+        }
+        return true
+    }
+
+    private fun nextSegment(seg: Array<PathMeasure.Segment>): Array<PathMeasure.Segment> {
+        val ptIndex = seg.first().ptIndex
+        var index = 0
+        do {
+            ++index
+        } while(seg[index].ptIndex == ptIndex)
+        return seg.copyOfRange(index, seg.lastIndex)
+    }
+
+    private fun distanceToSegment(distance: Float): Pair<Array<Segment>, Float> {
+        val seg = segments.find { it.distance == distance }
+        var index = segments.indexOf(seg)
+        index = index xor index.shr(31)
+        val tmpSeg = (segments as Array<Segment>).copyOfRange(index,
+                                                              segments.lastIndex)
+
+        var startT = 0F
+        var startD = 0F
+        if(index > 0) {
+            startD = segments[index - 1].distance
+            if(segments[index - 1].ptIndex == tmpSeg.first().ptIndex) {
+                startT = segments[index - 1].getT()
+            }
+        }
+
+        val t = startT + (tmpSeg.first().getT() - startT) * (distance - startD) /
+                         (tmpSeg.first().distance - startD)
+        return Pair(tmpSeg, t)
+
+    }
+
 
 }
