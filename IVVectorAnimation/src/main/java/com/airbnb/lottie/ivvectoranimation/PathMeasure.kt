@@ -79,9 +79,7 @@ class Path {
     }
 
     fun arcTo(rect: RectF, i: Int, i1: Int, b: Boolean) {
-        path.arcTo(rect.centerX().toInt(), rect.centerY().toInt(), i, i1, 0)
-        // I don't think this is properly set up, we don't know
-        // what the 'r' input is on VectorPath arcTo()
+        // TODO: Properly implement it later
     }
 
     enum class FillType {
