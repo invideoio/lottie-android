@@ -367,7 +367,7 @@ public abstract class BaseStrokeContent
   }
 
   public static class BaseStrokeDrawState extends DrawState {
-    private List<Path> pathList;
+    public List<Path> pathList;
 
     public BaseStrokeDrawState(List<Path> pathList) {
       this.pathList = pathList;

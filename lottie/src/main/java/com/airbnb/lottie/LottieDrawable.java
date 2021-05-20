@@ -24,6 +24,7 @@ import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.airbnb.lottie.animation.content.DrawState;
 import com.airbnb.lottie.manager.FontAssetManager;
 import com.airbnb.lottie.manager.ImageAssetManager;
 import com.airbnb.lottie.model.KeyPath;
@@ -1279,5 +1280,38 @@ public class LottieDrawable extends Drawable implements Drawable.Callback, Anima
       return hashCode() == other.hashCode() && colorFilter == other.colorFilter;
 
     }
+  }
+
+  public DrawState computeDrawState() {
+    if (compositionLayer == null) {
+      return null;
+    }
+
+    int saveCount = -1;
+    Rect bounds = getBounds();
+    // In fitXY mode, the scale doesn't take effect.
+    float scaleX = bounds.width() / (float) composition.getBounds().width();
+    float scaleY = bounds.height() / (float) composition.getBounds().height();
+
+    if (isExtraScaleEnabled) {
+      float maxScale = Math.min(scaleX, scaleY);
+      float extraScale = 1f;
+      if (maxScale < 1f) {
+        extraScale = extraScale / maxScale;
+        scaleX = scaleX / extraScale;
+        scaleY = scaleY / extraScale;
+      }
+
+      if (extraScale > 1) {
+        float halfWidth = bounds.width() / 2f;
+        float halfHeight = bounds.height() / 2f;
+        float scaledHalfWidth = halfWidth * maxScale;
+        float scaledHalfHeight = halfHeight * maxScale;
+      }
+    }
+
+    matrix.reset();
+    matrix.preScale(scaleX, scaleY);
+    return(compositionLayer.computeDrawState(matrix, alpha));
   }
 }
