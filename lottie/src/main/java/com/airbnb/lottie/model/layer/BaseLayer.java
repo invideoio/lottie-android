@@ -1,6 +1,15 @@
 package com.airbnb.lottie.model.layer;
 
-import android.graphics.*;
+// import android.graphics.*;
+import com.airbnb.lottie.ivvectoranimation.Path;
+
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.RectF;
 import android.os.Build;
 import androidx.annotation.CallSuper;
 import androidx.annotation.FloatRange;
@@ -445,7 +454,7 @@ public abstract class BaseLayer
     path.set(maskPath);
     path.transform(matrix);
     contentPaint.setAlpha((int) (opacityAnimation.getValue() * 2.55f));
-    canvas.drawPath(path, contentPaint);
+    // canvas.drawPath(path, contentPaint);
   }
 
   private void applyInvertedAddMask(Canvas canvas, Matrix matrix, Mask mask,
@@ -456,7 +465,7 @@ public abstract class BaseLayer
     path.set(maskPath);
     path.transform(matrix);
     contentPaint.setAlpha((int) (opacityAnimation.getValue() * 2.55f));
-    canvas.drawPath(path, dstOutPaint);
+    // canvas.drawPath(path, dstOutPaint);
     canvas.restore();
   }
 
@@ -465,7 +474,7 @@ public abstract class BaseLayer
     Path maskPath = maskAnimation.getValue();
     path.set(maskPath);
     path.transform(matrix);
-    canvas.drawPath(path, dstOutPaint);
+    // canvas.drawPath(path, dstOutPaint);
   }
 
   private void applyInvertedSubtractMask(Canvas canvas, Matrix matrix, Mask mask,
@@ -476,7 +485,7 @@ public abstract class BaseLayer
     Path maskPath = maskAnimation.getValue();
     path.set(maskPath);
     path.transform(matrix);
-    canvas.drawPath(path, dstOutPaint);
+    // canvas.drawPath(path, dstOutPaint);
     canvas.restore();
   }
 
@@ -487,7 +496,7 @@ public abstract class BaseLayer
     path.set(maskPath);
     path.transform(matrix);
     contentPaint.setAlpha((int) (opacityAnimation.getValue() * 2.55f));
-    canvas.drawPath(path, contentPaint);
+    // canvas.drawPath(path, contentPaint);
     canvas.restore();
   }
 
@@ -499,7 +508,7 @@ public abstract class BaseLayer
     Path maskPath = maskAnimation.getValue();
     path.set(maskPath);
     path.transform(matrix);
-    canvas.drawPath(path, dstOutPaint);
+    // canvas.drawPath(path, dstOutPaint);
     canvas.restore();
   }
 

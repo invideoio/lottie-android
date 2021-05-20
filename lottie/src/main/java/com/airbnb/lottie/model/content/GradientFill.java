@@ -1,6 +1,6 @@
 package com.airbnb.lottie.model.content;
 
-import android.graphics.Path;
+import com.airbnb.lottie.ivvectoranimation.Path;;
 import androidx.annotation.Nullable;
 
 import com.airbnb.lottie.LottieDrawable;

@@ -1,7 +1,7 @@
 package com.airbnb.lottie.animation.keyframe;
 
-import android.graphics.Path;
-import android.graphics.PathMeasure;
+import com.airbnb.lottie.ivvectoranimation.Path;;
+import com.airbnb.lottie.ivvectoranimation.PathMeasure;
 import android.graphics.PointF;
 
 import com.airbnb.lottie.value.Keyframe;

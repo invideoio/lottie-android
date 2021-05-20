@@ -7,9 +7,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-// import android.graphics.Path;
+// import com.airbnb.lottie.ivvectoranimation.Path;;
 import com.airbnb.lottie.ivvectoranimation.Path;
-// import android.graphics.PathMeasure;
+// import com.airbnb.lottie.ivvectoranimation.PathMeasure;
 import com.airbnb.lottie.ivvectoranimation.PathMeasure;
 import android.graphics.PointF;
 import android.graphics.RectF;
@@ -313,15 +313,15 @@ public final class Utils {
   /**
    * For testing purposes only. DO NOT USE IN PRODUCTION.
    */
-  // public static Bitmap renderPath(Path path) {
-  //   RectF bounds = new RectF();
-  //   path.computeBounds(bounds, false);
-  //   Bitmap bitmap = Bitmap.createBitmap((int) bounds.right, (int) bounds.bottom, Bitmap.Config.ARGB_8888);
-  //   Canvas canvas = new Canvas(bitmap);
-  //   Paint paint = new LPaint();
-  //   paint.setAntiAlias(true);
-  //   paint.setColor(Color.BLUE);
-  //   // canvas.drawPath(path, paint);
-  //   return bitmap;
-  // }
+  public static Bitmap renderPath(Path path) {
+    RectF bounds = new RectF();
+    // path.computeBounds(bounds, false);
+    Bitmap bitmap = Bitmap.createBitmap((int) bounds.right, (int) bounds.bottom, Bitmap.Config.ARGB_8888);
+    Canvas canvas = new Canvas(bitmap);
+    Paint paint = new LPaint();
+    paint.setAntiAlias(true);
+    paint.setColor(Color.BLUE);
+    // canvas.drawPath(path, paint);
+    return bitmap;
+  }
 }

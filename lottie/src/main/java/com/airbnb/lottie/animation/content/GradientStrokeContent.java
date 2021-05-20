@@ -78,7 +78,7 @@ public class GradientStrokeContent extends BaseStrokeContent {
     shader.setLocalMatrix(parentMatrix);
     paint.setShader(shader);
 
-    super.draw(canvas, parentMatrix, parentAlpha);
+    // super.draw(canvas, parentMatrix, parentAlpha);
   }
 
   @Override public String getName() {

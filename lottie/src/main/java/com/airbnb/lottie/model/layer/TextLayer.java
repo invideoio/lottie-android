@@ -4,7 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Path;
+import com.airbnb.lottie.ivvectoranimation.Path;;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import androidx.annotation.Nullable;
@@ -380,7 +380,7 @@ public class TextLayer extends BaseLayer {
     if (paint.getStyle() == Paint.Style.STROKE && paint.getStrokeWidth() == 0) {
       return;
     }
-    canvas.drawPath(path, paint);
+    // canvas.drawPath(path, paint);
   }
 
   private void drawCharacterFromFont(String character, DocumentData documentData, Canvas canvas) {

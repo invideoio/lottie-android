@@ -2,7 +2,7 @@ package com.airbnb.lottie.animation.content;
 
 import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.graphics.Path;
+import com.airbnb.lottie.ivvectoranimation.Path;;
 import android.graphics.RectF;
 import androidx.annotation.Nullable;
 

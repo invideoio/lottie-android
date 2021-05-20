@@ -5,8 +5,8 @@ import android.graphics.ColorFilter;
 import android.graphics.DashPathEffect;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.PathMeasure;
+import com.airbnb.lottie.ivvectoranimation.Path;
+import com.airbnb.lottie.ivvectoranimation.PathMeasure;
 import android.graphics.RectF;
 import androidx.annotation.CallSuper;
 import androidx.annotation.Nullable;
@@ -162,113 +162,113 @@ public abstract class BaseStrokeContent
     return new BaseStrokeDrawState(pathList);
   }
 
-  @Override public void draw(Canvas canvas, Matrix parentMatrix, int parentAlpha) {
-    L.beginSection("StrokeContent#draw");
-    if (Utils.hasZeroScaleAxis(parentMatrix)) {
-      L.endSection("StrokeContent#draw");
-      return;
-    }
-    int alpha = (int) ((parentAlpha / 255f * ((IntegerKeyframeAnimation) opacityAnimation).getIntValue() / 100f) * 255);
-    paint.setAlpha(clamp(alpha, 0, 255));
-    paint.setStrokeWidth(((FloatKeyframeAnimation) widthAnimation).getFloatValue() * Utils.getScale(parentMatrix));
-    if (paint.getStrokeWidth() <= 0) {
-      // Android draws a hairline stroke for 0, After Effects doesn't.
-      L.endSection("StrokeContent#draw");
-      return;
-    }
-    applyDashPatternIfNeeded(parentMatrix);
+  // @Override public void draw(Canvas canvas, Matrix parentMatrix, int parentAlpha) {
+  //   L.beginSection("StrokeContent#draw");
+  //   if (Utils.hasZeroScaleAxis(parentMatrix)) {
+  //     L.endSection("StrokeContent#draw");
+  //     return;
+  //   }
+  //   int alpha = (int) ((parentAlpha / 255f * ((IntegerKeyframeAnimation) opacityAnimation).getIntValue() / 100f) * 255);
+  //   paint.setAlpha(clamp(alpha, 0, 255));
+  //   paint.setStrokeWidth(((FloatKeyframeAnimation) widthAnimation).getFloatValue() * Utils.getScale(parentMatrix));
+  //   if (paint.getStrokeWidth() <= 0) {
+  //     // Android draws a hairline stroke for 0, After Effects doesn't.
+  //     L.endSection("StrokeContent#draw");
+  //     return;
+  //   }
+  //   applyDashPatternIfNeeded(parentMatrix);
+  //
+  //   if (colorFilterAnimation != null) {
+  //     paint.setColorFilter(colorFilterAnimation.getValue());
+  //   }
+  //
+  //   for (int i = 0; i < pathGroups.size(); i++) {
+  //     PathGroup pathGroup = pathGroups.get(i);
+  //
+  //
+  //     if (pathGroup.trimPath != null) {
+  //       applyTrimPath(canvas, pathGroup, parentMatrix);
+  //     } else {
+  //       L.beginSection("StrokeContent#buildPath");
+  //       path.reset();
+  //       for (int j = pathGroup.paths.size() - 1; j >= 0; j--) {
+  //         path.addPath(pathGroup.paths.get(j).getPath(), parentMatrix);
+  //       }
+  //       L.endSection("StrokeContent#buildPath");
+  //       L.beginSection("StrokeContent#drawPath");
+  //       canvas.drawPath(path, paint);
+  //       L.endSection("StrokeContent#drawPath");
+  //     }
+  //   }
+  //   L.endSection("StrokeContent#draw");
+  // }
 
-    if (colorFilterAnimation != null) {
-      paint.setColorFilter(colorFilterAnimation.getValue());
-    }
-
-    for (int i = 0; i < pathGroups.size(); i++) {
-      PathGroup pathGroup = pathGroups.get(i);
-
-
-      if (pathGroup.trimPath != null) {
-        applyTrimPath(canvas, pathGroup, parentMatrix);
-      } else {
-        L.beginSection("StrokeContent#buildPath");
-        path.reset();
-        for (int j = pathGroup.paths.size() - 1; j >= 0; j--) {
-          path.addPath(pathGroup.paths.get(j).getPath(), parentMatrix);
-        }
-        L.endSection("StrokeContent#buildPath");
-        L.beginSection("StrokeContent#drawPath");
-        canvas.drawPath(path, paint);
-        L.endSection("StrokeContent#drawPath");
-      }
-    }
-    L.endSection("StrokeContent#draw");
-  }
-
-  private void applyTrimPath(Canvas canvas, PathGroup pathGroup, Matrix parentMatrix) {
-    L.beginSection("StrokeContent#applyTrimPath");
-    if (pathGroup.trimPath == null) {
-      L.endSection("StrokeContent#applyTrimPath");
-      return;
-    }
-    path.reset();
-    for (int j = pathGroup.paths.size() - 1; j >= 0; j--) {
-      path.addPath(pathGroup.paths.get(j).getPath(), parentMatrix);
-    }
-    pm.setPath(path, false);
-    float totalLength = pm.getLength();
-    while (pm.nextContour()) {
-      totalLength += pm.getLength();
-    }
-    float offsetLength = totalLength * pathGroup.trimPath.getOffset().getValue() / 360f;
-    float startLength =
-        totalLength * pathGroup.trimPath.getStart().getValue() / 100f + offsetLength;
-    float endLength =
-        totalLength * pathGroup.trimPath.getEnd().getValue() / 100f + offsetLength;
-
-    float currentLength = 0;
-    for (int j = pathGroup.paths.size() - 1; j >= 0; j--) {
-      trimPathPath.set(pathGroup.paths.get(j).getPath());
-      trimPathPath.transform(parentMatrix);
-      pm.setPath(trimPathPath, false);
-      float length = pm.getLength();
-      if (endLength > totalLength && endLength - totalLength < currentLength + length &&
-          currentLength < endLength - totalLength) {
-        // Draw the segment when the end is greater than the length which wraps around to the
-        // beginning.
-        float startValue;
-        if (startLength > totalLength) {
-          startValue = (startLength - totalLength) / length;
-        } else {
-          startValue = 0;
-        }
-        float endValue = Math.min((endLength - totalLength) / length, 1);
-        Utils.applyTrimPathIfNeeded(trimPathPath, startValue, endValue, 0);
-        canvas.drawPath(trimPathPath, paint);
-      } else
-        //noinspection StatementWithEmptyBody
-        if (currentLength + length < startLength || currentLength > endLength) {
-          // Do nothing
-        } else if (currentLength + length <= endLength && startLength < currentLength) {
-          canvas.drawPath(trimPathPath, paint);
-        } else {
-          float startValue;
-          if (startLength < currentLength) {
-            startValue = 0;
-          } else {
-            startValue = (startLength - currentLength) / length;
-          }
-          float endValue;
-          if (endLength > currentLength + length) {
-            endValue = 1f;
-          } else {
-            endValue = (endLength - currentLength) / length;
-          }
-          Utils.applyTrimPathIfNeeded(trimPathPath, startValue, endValue, 0);
-          canvas.drawPath(trimPathPath, paint);
-        }
-      currentLength += length;
-    }
-    L.endSection("StrokeContent#applyTrimPath");
-  }
+  // private void applyTrimPath(Canvas canvas, PathGroup pathGroup, Matrix parentMatrix) {
+  //   L.beginSection("StrokeContent#applyTrimPath");
+  //   if (pathGroup.trimPath == null) {
+  //     L.endSection("StrokeContent#applyTrimPath");
+  //     return;
+  //   }
+  //   path.reset();
+  //   for (int j = pathGroup.paths.size() - 1; j >= 0; j--) {
+  //     path.addPath(pathGroup.paths.get(j).getPath(), parentMatrix);
+  //   }
+  //   pm.setPath(path, false);
+  //   float totalLength = pm.getLength();
+  //   while (pm.nextContour()) {
+  //     totalLength += pm.getLength();
+  //   }
+  //   float offsetLength = totalLength * pathGroup.trimPath.getOffset().getValue() / 360f;
+  //   float startLength =
+  //       totalLength * pathGroup.trimPath.getStart().getValue() / 100f + offsetLength;
+  //   float endLength =
+  //       totalLength * pathGroup.trimPath.getEnd().getValue() / 100f + offsetLength;
+  //
+  //   float currentLength = 0;
+  //   for (int j = pathGroup.paths.size() - 1; j >= 0; j--) {
+  //     trimPathPath.set(pathGroup.paths.get(j).getPath());
+  //     trimPathPath.transform(parentMatrix);
+  //     pm.setPath(trimPathPath, false);
+  //     float length = pm.getLength();
+  //     if (endLength > totalLength && endLength - totalLength < currentLength + length &&
+  //         currentLength < endLength - totalLength) {
+  //       // Draw the segment when the end is greater than the length which wraps around to the
+  //       // beginning.
+  //       float startValue;
+  //       if (startLength > totalLength) {
+  //         startValue = (startLength - totalLength) / length;
+  //       } else {
+  //         startValue = 0;
+  //       }
+  //       float endValue = Math.min((endLength - totalLength) / length, 1);
+  //       Utils.applyTrimPathIfNeeded(trimPathPath, startValue, endValue, 0);
+  //       canvas.drawPath(trimPathPath, paint);
+  //     } else
+  //       //noinspection StatementWithEmptyBody
+  //       if (currentLength + length < startLength || currentLength > endLength) {
+  //         // Do nothing
+  //       } else if (currentLength + length <= endLength && startLength < currentLength) {
+  //         canvas.drawPath(trimPathPath, paint);
+  //       } else {
+  //         float startValue;
+  //         if (startLength < currentLength) {
+  //           startValue = 0;
+  //         } else {
+  //           startValue = (startLength - currentLength) / length;
+  //         }
+  //         float endValue;
+  //         if (endLength > currentLength + length) {
+  //           endValue = 1f;
+  //         } else {
+  //           endValue = (endLength - currentLength) / length;
+  //         }
+  //         Utils.applyTrimPathIfNeeded(trimPathPath, startValue, endValue, 0);
+  //         canvas.drawPath(trimPathPath, paint);
+  //       }
+  //     currentLength += length;
+  //   }
+  //   L.endSection("StrokeContent#applyTrimPath");
+  // }
 
   @Override public void getBounds(RectF outBounds, Matrix parentMatrix, boolean applyParents) {
     L.beginSection("StrokeContent#getBounds");

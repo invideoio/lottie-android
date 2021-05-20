@@ -1,8 +1,12 @@
 package com.airbnb.lottie.ivvectoranimation
 
-//import android.graphics.Path
-import android.graphics.Point
+//import com.airbnb.lottie.ivvectoranimation.Path;
+import android.graphics.Matrix
 import android.graphics.PointF
+import android.graphics.RectF
+import androidx.core.graphics.translationMatrix
+import com.soywiz.korma.geom.BoundsBuilder
+import com.soywiz.korma.geom.Rectangle
 import com.soywiz.korma.geom.vector.*
 import kotlin.math.*
 
@@ -11,6 +15,7 @@ const val CHEAP_DIST_LIMIT = 0.5F
 
 class Path {
 
+    var fillType: Path.FillType = FillType.EVEN_ODD
     var path: VectorPath = VectorPath()
 
     fun moveTo(x: Float, y: Float) {
@@ -35,6 +40,55 @@ class Path {
 
     fun set(tempPath: Path) {
         path.setFrom(tempPath.path)
+    }
+
+    fun close() {
+        path.close()
+    }
+
+    fun offset(x: Float, y: Float) {
+        val matrix = com.soywiz.korma.geom.Matrix(1F, 0F,
+                                                  0F, 1F,
+                                                   x, y)
+        path.applyTransform(matrix)
+    }
+
+    fun addPath(tempPath: Path, matrix: Matrix) {
+        tempPath.transform(matrix)
+        path.appendFrom(tempPath.path)
+    }
+
+    fun computeBounds(rect: RectF, b: Boolean) {
+        val rectangle = Rectangle()
+        path.getBounds(rectangle, BoundsBuilder())
+        rect.set(
+                rectangle.left.toFloat(),
+                rectangle.top.toFloat(),
+                rectangle.right.toFloat(),
+                rectangle.bottom.toFloat()
+        )
+    }
+
+    fun transform(matrix: Matrix) {
+        val values = FloatArray(9)
+        matrix.getValues(values)
+        val korgeMatrix = com.soywiz.korma.geom.Matrix(values[0], values[1],
+                                                       values[3], values[4],
+                                                       values[2], values[5])
+        path.applyTransform(korgeMatrix)
+    }
+
+    fun arcTo(rect: RectF, i: Int, i1: Int, b: Boolean) {
+        path.arcTo(rect.centerX().toInt(), rect.centerY().toInt(), i, i1, 0)
+        // I don't think this is properly set up, we don't know
+        // what the 'r' input is on VectorPath arcTo()
+    }
+
+    enum class FillType {
+        EVEN_ODD,
+        INVERSE_EVEN_ODD,
+        INVERSE_WINDING,
+        WINDING
     }
 
     // THIS FUNCTION IS NOT BEING USED IN PRODUCTION
@@ -131,7 +185,7 @@ class PathMeasure(var path: VectorPath = VectorPath(), var forceClosed : Boolean
 
     fun lerp(a: PointF, b: PointF, t: PointF) : PointF {
 
-        var x = 0F
+        var x : Float
         if(t.x <= 0.0f) {
             x = a.x
         } else if(t.x >= 1.0f) {
@@ -230,9 +284,9 @@ class PathMeasure(var path: VectorPath = VectorPath(), var forceClosed : Boolean
         return QuadCoeff(src).eval(tt)
     }
 
-    fun evalQuadAt(src: Array<PointF>, t: Float, pt: PointF, tangent: Vec2) {
+    fun evalQuadAt(src: Array<PointF>, t: Float, pt: PointF, tangent: Vec2?) {
         pt.set(evalQuadAt(src, t))
-        tangent.set(evalQuadTangentAt(src, t))
+        tangent?.set(evalQuadTangentAt(src, t))
     }
 
     private fun evalQuadTangentAt(src: Array<PointF>, t: Float): Vec2 {
@@ -327,7 +381,7 @@ class PathMeasure(var path: VectorPath = VectorPath(), var forceClosed : Boolean
 
             val first_tmp = arrayOf(tmp[0], tmp[1], tmp[2])
             val second_tmp = arrayOf(tmp[2], tmp[3], tmp[4])
-            newDist = compute_quad_segs(first_tmp, distance, mint, halfT, ptIndex)
+            newDist = compute_quad_segs(first_tmp, newDist, mint, halfT, ptIndex)
             newDist = compute_quad_segs(second_tmp, newDist, halfT, maxt, ptIndex)
         } else {
             val d = PointF.length(pts[0].x - pts[2].x, pts[0].y - pts[2].y)
@@ -514,18 +568,17 @@ class PathMeasure(var path: VectorPath = VectorPath(), var forceClosed : Boolean
 
     }
 
-    fun compute_pos_tan(pts: Array<PointF>, segType: SegType, t: Float,
-                        pos: PointF, tangent: Vec2
-    ) {
+    fun computePosTan(pts: Array<PointF>, segType: SegType, t: Float,
+                      pos: PointF, tangent: Vec2?) {
         when(segType) {
             SegType.kLine_SegType -> {
                 val tt = PointF(t, t)
                 pos.set(lerp(pts[0], pts[1], tt))
-                tangent.normalize(pts[1].x - pts[0].x, pts[1].y - pts[0].y)
+                tangent?.normalize(pts[1].x - pts[0].x, pts[1].y - pts[0].y)
             }
             SegType.kQuad_SegType -> {
                 evalQuadAt(pts, t, pos, tangent)
-                tangent.normalize(tangent.x, tangent.y)
+                tangent?.normalize(tangent.x, tangent.y)
             }
             SegType.kConic_SegType -> println("Conic SegType not implemented")
 //            {
@@ -538,27 +591,27 @@ class PathMeasure(var path: VectorPath = VectorPath(), var forceClosed : Boolean
                 evalCubicAt(pts, t, pos, tangent) // NOTE: Originally, this receives a nullptr,
                                                   // is there anywhere on code where this final
                                                   // value is passed ???
-                tangent.normalize(tangent.x, tangent.y)
+                tangent?.normalize(tangent.x, tangent.y)
             }
         }
     }
 
     private fun evalCubicAt(src: Array<PointF>, t: Float,
-                            loc: PointF, tangent: Vec2
+                            loc: PointF, tangent: Vec2?
     ) {
         loc.set(CubicCoeff(src).eval(t))
         if((t == 0F && src[0] == src[1]) || (t == 1F && src[2] == src[3])) {
             if(t == 0F) {
                 val vec02 = Vec2(src[2].x - src[0].x,
                                  src[2].y - src[0].y)
-                tangent.set(vec02)
+                tangent?.set(vec02)
             } else {
                 val vec13 = Vec2(src[3].x - src[1].x,
                                  src[3].y - src[1].y)
-                tangent.set(vec13)
+                tangent?.set(vec13)
             }
         } else {
-            tangent.set(eval_cubic_derivative(src, t))
+            tangent?.set(eval_cubic_derivative(src, t))
         }
 
         // NOTE: This function has a 4th input pointer called curvature, which is not being used
@@ -588,7 +641,6 @@ class PathMeasure(var path: VectorPath = VectorPath(), var forceClosed : Boolean
         var ptIndex = this.firstPtIndex
         var distance = 0F
         var isClosed = this.forceClosed
-        val seg = Segment(0F, 0)
 
         segments.clear()
         path.visitCmds(
@@ -691,7 +743,7 @@ class PathMeasure(var path: VectorPath = VectorPath(), var forceClosed : Boolean
         if(startWithMoveTo) {
             val tmpPts = (this.pts as Array<PointF>).copyOfRange(seg.first().ptIndex, pts.lastIndex)
             // update this.pts
-            compute_pos_tan(tmpPts, seg.first().type, startT, p, Vec2(0F, 0F))
+            computePosTan(tmpPts, seg.first().type, startT, p, Vec2(0F, 0F))
             dst.moveTo(p.x, p.y)
         }
 
@@ -740,8 +792,27 @@ class PathMeasure(var path: VectorPath = VectorPath(), var forceClosed : Boolean
         val t = startT + (tmpSeg.first().getT() - startT) * (distance - startD) /
                          (tmpSeg.first().distance - startD)
         return Pair(tmpSeg, t)
-
     }
 
+    fun getPosTan(distance: Float, pos: FloatArray, tangent: Vec2?) : Boolean {
+        if(path.isEmpty()) return false
+
+        val length = getLength()
+        val count = segments.count()
+
+        if(count == 0 || length == 0F) return false
+
+        val distance = min(max(0F, distance), length)
+        val pairSegT = distanceToSegment(distance)
+        val seg = pairSegT.first
+        val t = pairSegT.second
+
+        val tmpPts = (pts as Array<PointF>).copyOfRange(seg.first().ptIndex, pts.lastIndex)
+        val posPoint = PointF(pos[0], pos[1])
+        computePosTan(tmpPts, seg.first().type, t, posPoint, tangent)
+        pos[0] = posPoint.x
+        pos[1] = posPoint.y
+        return true
+    }
 
 }

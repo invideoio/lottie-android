@@ -1,6 +1,6 @@
 package com.airbnb.lottie.animation.keyframe;
 
-import android.graphics.Path;
+import com.airbnb.lottie.ivvectoranimation.Path;
 
 import com.airbnb.lottie.model.animatable.AnimatableIntegerValue;
 import com.airbnb.lottie.model.content.Mask;

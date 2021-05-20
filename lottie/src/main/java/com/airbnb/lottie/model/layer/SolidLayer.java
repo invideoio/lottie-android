@@ -5,7 +5,7 @@ import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Path;
+import com.airbnb.lottie.ivvectoranimation.Path;;
 import android.graphics.RectF;
 import androidx.annotation.Nullable;
 
@@ -66,7 +66,7 @@ public class SolidLayer extends BaseLayer {
       path.lineTo(points[6], points[7]);
       path.lineTo(points[0], points[1]);
       path.close();
-      canvas.drawPath(path, paint);
+      // canvas.drawPath(path, paint);
     }
   }
 

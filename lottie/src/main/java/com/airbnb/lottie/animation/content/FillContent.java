@@ -4,7 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Path;
+import com.airbnb.lottie.ivvectoranimation.Path;;
 import android.graphics.RectF;
 import androidx.annotation.Nullable;
 
@@ -95,7 +95,7 @@ public class FillContent
       path.addPath(paths.get(i).getPath(), parentMatrix);
     }
 
-    canvas.drawPath(path, paint);
+    // canvas.drawPath(path, paint);
 
     L.endSection("FillContent#draw");
   }

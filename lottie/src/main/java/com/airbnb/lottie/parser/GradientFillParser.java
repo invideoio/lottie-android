@@ -1,6 +1,6 @@
 package com.airbnb.lottie.parser;
 
-import android.graphics.Path;
+import com.airbnb.lottie.ivvectoranimation.Path;;
 
 import android.webkit.JsResult;
 import com.airbnb.lottie.LottieComposition;
