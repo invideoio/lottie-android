@@ -4,7 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import com.airbnb.lottie.ivvectoranimation.Path;;
+import com.airbnb.lottie.ivvectoranimation.Path;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import androidx.annotation.Nullable;
@@ -32,6 +32,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.airbnb.lottie.ivvectoranimation.PathUtils.androidPath;
 
 public class TextLayer extends BaseLayer {
   // Capacity is 2 because emojis are 2 characters. Some are longer in which case, the capacity will
@@ -380,7 +382,7 @@ public class TextLayer extends BaseLayer {
     if (paint.getStyle() == Paint.Style.STROKE && paint.getStrokeWidth() == 0) {
       return;
     }
-    // canvas.drawPath(path, paint);
+    canvas.drawPath(androidPath(path), paint);
   }
 
   private void drawCharacterFromFont(String character, DocumentData documentData, Canvas canvas) {

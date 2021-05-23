@@ -31,8 +31,8 @@ android {
 }
 
 dependencies {
-  compileOnly("com.soywiz.korlibs.korma:korma-android:2.0.3")
-  compileOnly("com.airbnb.android:ivvectoranimation:3.4.3-IV")
+  implementation("com.soywiz.korlibs.korma:korma-android:2.0.3")
+  implementation("com.airbnb.android:ivvectoranimation:3.4.3-IV")
   implementation "androidx.appcompat:appcompat:1.0.0"
   testImplementation "org.mockito:mockito-core:2.15.0"
   testImplementation 'junit:junit:4.12'

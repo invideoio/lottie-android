@@ -4,7 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import com.airbnb.lottie.ivvectoranimation.Path;;
+import com.airbnb.lottie.ivvectoranimation.Path;
 import android.graphics.RectF;
 import androidx.annotation.Nullable;
 
@@ -24,6 +24,7 @@ import com.airbnb.lottie.value.LottieValueCallback;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.airbnb.lottie.ivvectoranimation.PathUtils.androidPath;
 import static com.airbnb.lottie.utils.MiscUtils.clamp;
 
 public class FillContent
@@ -95,7 +96,7 @@ public class FillContent
       path.addPath(paths.get(i).getPath(), parentMatrix);
     }
 
-    // canvas.drawPath(path, paint);
+    canvas.drawPath(androidPath(path), paint);
 
     L.endSection("FillContent#draw");
   }

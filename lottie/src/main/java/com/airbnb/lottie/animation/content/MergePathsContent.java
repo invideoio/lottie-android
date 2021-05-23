@@ -1,7 +1,7 @@
 package com.airbnb.lottie.animation.content;
 
 import android.annotation.TargetApi;
-import com.airbnb.lottie.ivvectoranimation.Path;;
+import com.airbnb.lottie.ivvectoranimation.Path;
 import android.os.Build;
 
 import com.airbnb.lottie.model.content.MergePaths;
@@ -48,29 +48,29 @@ public class MergePathsContent implements PathContent, GreedyContent {
   }
 
   @Override public Path getPath() {
-    // path.reset();
-    //
-    // if (mergePaths.isHidden()) {
-    //   return path;
-    // }
-    //
-    // switch (mergePaths.getMode()) {
-    //   case MERGE:
-    //     addPaths();
-    //     break;
-    //   case ADD:
-    //     opFirstPathWithRest(Path.Op.UNION);
-    //     break;
-    //   case SUBTRACT:
-    //     opFirstPathWithRest(Path.Op.REVERSE_DIFFERENCE);
-    //     break;
-    //   case INTERSECT:
-    //     opFirstPathWithRest(Path.Op.INTERSECT);
-    //     break;
-    //   case EXCLUDE_INTERSECTIONS:
-    //     opFirstPathWithRest(Path.Op.XOR);
-    //     break;
-    // }
+    path.reset();
+
+    if (mergePaths.isHidden()) {
+      return path;
+    }
+
+    switch (mergePaths.getMode()) {
+      case MERGE:
+        addPaths();
+        break;
+      case ADD:
+        opFirstPathWithRest(Path.Op.UNION);
+        break;
+      case SUBTRACT:
+        opFirstPathWithRest(Path.Op.REVERSE_DIFFERENCE);
+        break;
+      case INTERSECT:
+        opFirstPathWithRest(Path.Op.INTERSECT);
+        break;
+      case EXCLUDE_INTERSECTIONS:
+        opFirstPathWithRest(Path.Op.XOR);
+        break;
+    }
 
     return path;
   }
@@ -85,38 +85,38 @@ public class MergePathsContent implements PathContent, GreedyContent {
     }
   }
 
-  // @TargetApi(Build.VERSION_CODES.KITKAT)
-  // private void opFirstPathWithRest(Path.Op op) {
-  //   remainderPath.reset();
-  //   firstPath.reset();
-  //
-  //   for (int i = pathContents.size() - 1; i >= 1; i--) {
-  //     PathContent content = pathContents.get(i);
-  //
-  //     if (content instanceof ContentGroup) {
-  //       List<PathContent> pathList = ((ContentGroup) content).getPathList();
-  //       for (int j = pathList.size() - 1; j >= 0; j--) {
-  //         Path path = pathList.get(j).getPath();
-  //         path.transform(((ContentGroup) content).getTransformationMatrix());
-  //         this.remainderPath.addPath(path);
-  //       }
-  //     } else {
-  //       remainderPath.addPath(content.getPath());
-  //     }
-  //   }
-  //
-  //   PathContent lastContent = pathContents.get(0);
-  //   if (lastContent instanceof ContentGroup) {
-  //     List<PathContent> pathList = ((ContentGroup) lastContent).getPathList();
-  //     for (int j = 0; j < pathList.size(); j++) {
-  //       Path path = pathList.get(j).getPath();
-  //       path.transform(((ContentGroup) lastContent).getTransformationMatrix());
-  //       this.firstPath.addPath(path);
-  //     }
-  //   } else {
-  //     firstPath.set(lastContent.getPath());
-  //   }
-  //
-  //   path.op(firstPath, remainderPath, op);
-  // }
+  @TargetApi(Build.VERSION_CODES.KITKAT)
+  private void opFirstPathWithRest(Path.Op op) {
+    remainderPath.reset();
+    firstPath.reset();
+
+    for (int i = pathContents.size() - 1; i >= 1; i--) {
+      PathContent content = pathContents.get(i);
+
+      if (content instanceof ContentGroup) {
+        List<PathContent> pathList = ((ContentGroup) content).getPathList();
+        for (int j = pathList.size() - 1; j >= 0; j--) {
+          Path path = pathList.get(j).getPath();
+          path.transform(((ContentGroup) content).getTransformationMatrix());
+          this.remainderPath.addPath(path);
+        }
+      } else {
+        remainderPath.addPath(content.getPath());
+      }
+    }
+
+    PathContent lastContent = pathContents.get(0);
+    if (lastContent instanceof ContentGroup) {
+      List<PathContent> pathList = ((ContentGroup) lastContent).getPathList();
+      for (int j = 0; j < pathList.size(); j++) {
+        Path path = pathList.get(j).getPath();
+        path.transform(((ContentGroup) lastContent).getTransformationMatrix());
+        this.firstPath.addPath(path);
+      }
+    } else {
+      firstPath.set(lastContent.getPath());
+    }
+
+    path.op(firstPath, remainderPath, op);
+  }
 }

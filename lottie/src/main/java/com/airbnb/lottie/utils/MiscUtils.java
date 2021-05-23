@@ -1,6 +1,6 @@
 package com.airbnb.lottie.utils;
 
-import com.airbnb.lottie.ivvectoranimation.Path;;
+import com.airbnb.lottie.ivvectoranimation.Path;
 import android.graphics.PointF;
 import androidx.annotation.FloatRange;
 

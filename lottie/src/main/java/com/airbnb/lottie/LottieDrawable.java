@@ -1182,7 +1182,7 @@ public class LottieDrawable extends Drawable implements Drawable.Callback, Anima
 
     matrix.reset();
     matrix.preScale(scaleX, scaleY);
-    Log.d("Lottie state", compositionLayer.computeDrawState(matrix, alpha).toString());
+//    Log.d("Lottie state", compositionLayer.computeDrawState(matrix, alpha).toString());
     compositionLayer.draw(canvas, matrix, alpha);
 
     if (saveCount > 0) {
@@ -1228,7 +1228,7 @@ public class LottieDrawable extends Drawable implements Drawable.Callback, Anima
 
     matrix.reset();
     matrix.preScale(scale, scale);
-    Log.d("Lottie state", compositionLayer.computeDrawState(matrix, alpha).toString());
+//    Log.d("Lottie state", compositionLayer.computeDrawState(matrix, alpha).toString());
 
     compositionLayer.draw(canvas, matrix, alpha);
 

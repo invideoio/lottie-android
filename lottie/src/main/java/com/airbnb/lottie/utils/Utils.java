@@ -7,9 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-// import com.airbnb.lottie.ivvectoranimation.Path;;
 import com.airbnb.lottie.ivvectoranimation.Path;
-// import com.airbnb.lottie.ivvectoranimation.PathMeasure;
 import com.airbnb.lottie.ivvectoranimation.PathMeasure;
 import android.graphics.PointF;
 import android.graphics.RectF;
@@ -32,6 +30,8 @@ import java.net.UnknownServiceException;
 import java.nio.channels.ClosedChannelException;
 
 import javax.net.ssl.SSLException;
+
+import static com.airbnb.lottie.ivvectoranimation.PathUtils.androidPath;
 
 public final class Utils {
   public static final int SECOND_IN_NANOS = 1000000000;
@@ -315,13 +315,13 @@ public final class Utils {
    */
   public static Bitmap renderPath(Path path) {
     RectF bounds = new RectF();
-    // path.computeBounds(bounds, false);
+    path.computeBounds(bounds, false);
     Bitmap bitmap = Bitmap.createBitmap((int) bounds.right, (int) bounds.bottom, Bitmap.Config.ARGB_8888);
     Canvas canvas = new Canvas(bitmap);
     Paint paint = new LPaint();
     paint.setAntiAlias(true);
     paint.setColor(Color.BLUE);
-    // canvas.drawPath(path, paint);
+    canvas.drawPath(androidPath(path), paint);
     return bitmap;
   }
 }

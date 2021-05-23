@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.airbnb.lottie.ivvectoranimation.PathUtils.androidPath;
+
 public abstract class BaseLayer
     implements DrawingContent, BaseKeyframeAnimation.AnimationListener, KeyPathElement {
   /**
@@ -454,7 +456,7 @@ public abstract class BaseLayer
     path.set(maskPath);
     path.transform(matrix);
     contentPaint.setAlpha((int) (opacityAnimation.getValue() * 2.55f));
-    // canvas.drawPath(path, contentPaint);
+    canvas.drawPath(androidPath(path), contentPaint);
   }
 
   private void applyInvertedAddMask(Canvas canvas, Matrix matrix, Mask mask,
@@ -465,7 +467,7 @@ public abstract class BaseLayer
     path.set(maskPath);
     path.transform(matrix);
     contentPaint.setAlpha((int) (opacityAnimation.getValue() * 2.55f));
-    // canvas.drawPath(path, dstOutPaint);
+    canvas.drawPath(androidPath(path), dstOutPaint);
     canvas.restore();
   }
 
@@ -474,7 +476,7 @@ public abstract class BaseLayer
     Path maskPath = maskAnimation.getValue();
     path.set(maskPath);
     path.transform(matrix);
-    // canvas.drawPath(path, dstOutPaint);
+    canvas.drawPath(androidPath(path), dstOutPaint);
   }
 
   private void applyInvertedSubtractMask(Canvas canvas, Matrix matrix, Mask mask,
@@ -485,7 +487,7 @@ public abstract class BaseLayer
     Path maskPath = maskAnimation.getValue();
     path.set(maskPath);
     path.transform(matrix);
-    // canvas.drawPath(path, dstOutPaint);
+    canvas.drawPath(androidPath(path), dstOutPaint);
     canvas.restore();
   }
 
@@ -496,7 +498,7 @@ public abstract class BaseLayer
     path.set(maskPath);
     path.transform(matrix);
     contentPaint.setAlpha((int) (opacityAnimation.getValue() * 2.55f));
-    // canvas.drawPath(path, contentPaint);
+    canvas.drawPath(androidPath(path), contentPaint);
     canvas.restore();
   }
 
@@ -508,7 +510,7 @@ public abstract class BaseLayer
     Path maskPath = maskAnimation.getValue();
     path.set(maskPath);
     path.transform(matrix);
-    // canvas.drawPath(path, dstOutPaint);
+    canvas.drawPath(androidPath(path), dstOutPaint);
     canvas.restore();
   }
 

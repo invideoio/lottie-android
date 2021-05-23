@@ -5,7 +5,7 @@ import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import com.airbnb.lottie.ivvectoranimation.Path;;
+import com.airbnb.lottie.ivvectoranimation.Path;
 import android.graphics.RectF;
 import androidx.annotation.Nullable;
 
@@ -16,6 +16,8 @@ import com.airbnb.lottie.animation.content.DrawState;
 import com.airbnb.lottie.animation.keyframe.BaseKeyframeAnimation;
 import com.airbnb.lottie.animation.keyframe.ValueCallbackKeyframeAnimation;
 import com.airbnb.lottie.value.LottieValueCallback;
+
+import static com.airbnb.lottie.ivvectoranimation.PathUtils.androidPath;
 
 public class SolidLayer extends BaseLayer {
   private final RectF rect = new RectF();
@@ -66,7 +68,7 @@ public class SolidLayer extends BaseLayer {
       path.lineTo(points[6], points[7]);
       path.lineTo(points[0], points[1]);
       path.close();
-      // canvas.drawPath(path, paint);
+      canvas.drawPath(androidPath(path), paint);
     }
   }
 

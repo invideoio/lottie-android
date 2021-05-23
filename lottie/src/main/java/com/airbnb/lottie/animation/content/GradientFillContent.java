@@ -5,7 +5,7 @@ import android.graphics.ColorFilter;
 import android.graphics.LinearGradient;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import com.airbnb.lottie.ivvectoranimation.Path;;
+import com.airbnb.lottie.ivvectoranimation.Path;
 import android.graphics.PointF;
 import android.graphics.RadialGradient;
 import android.graphics.RectF;
@@ -31,6 +31,7 @@ import com.airbnb.lottie.value.LottieValueCallback;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.airbnb.lottie.ivvectoranimation.PathUtils.androidPath;
 import static com.airbnb.lottie.utils.MiscUtils.clamp;
 
 public class GradientFillContent
@@ -125,7 +126,7 @@ public class GradientFillContent
     int alpha = (int) ((parentAlpha / 255f * opacityAnimation.getValue() / 100f) * 255);
     paint.setAlpha(clamp(alpha, 0, 255));
 
-    // canvas.drawPath(path, paint);
+    canvas.drawPath(androidPath(path), paint);
     L.endSection("GradientFillContent#draw");
   }
 

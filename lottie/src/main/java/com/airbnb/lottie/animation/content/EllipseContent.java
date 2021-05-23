@@ -1,6 +1,5 @@
 package com.airbnb.lottie.animation.content;
 
-// import com.airbnb.lottie.ivvectoranimation.Path;;
 import com.airbnb.lottie.ivvectoranimation.Path;
 import android.graphics.PointF;
 

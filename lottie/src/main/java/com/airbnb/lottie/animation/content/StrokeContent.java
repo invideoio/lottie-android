@@ -48,7 +48,7 @@ public class StrokeContent extends BaseStrokeContent {
     if (colorFilterAnimation != null) {
       paint.setColorFilter(colorFilterAnimation.getValue());
     }
-    // super.draw(canvas, parentMatrix, parentAlpha);
+    super.draw(canvas, parentMatrix, parentAlpha);
   }
 
   @Override public String getName() {
