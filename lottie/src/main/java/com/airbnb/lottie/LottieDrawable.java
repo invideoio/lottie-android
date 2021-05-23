@@ -55,6 +55,7 @@ import java.util.Set;
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class LottieDrawable extends Drawable implements Drawable.Callback, Animatable {
   private static final String TAG = LottieDrawable.class.getSimpleName();
+  private static final boolean DISABLE_DRAW = false;
 
   private interface LazyCompositionTask {
     void run(LottieComposition composition);
@@ -362,14 +363,16 @@ public class LottieDrawable extends Drawable implements Drawable.Callback, Anima
 
     L.beginSection("Drawable#draw");
 
-    if (safeMode) {
-      try {
+    if (!DISABLE_DRAW) {
+      if (safeMode) {
+        try {
+          drawInternal(canvas);
+        } catch (Throwable e) {
+          Logger.error("Lottie crashed in draw!", e);
+        }
+      } else {
         drawInternal(canvas);
-      } catch (Throwable e) {
-        Logger.error("Lottie crashed in draw!", e);
       }
-    } else {
-      drawInternal(canvas);
     }
 
     L.endSection("Drawable#draw");
